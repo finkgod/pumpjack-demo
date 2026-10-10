@@ -1,0 +1,430 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="robots" content="noindex" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#efe6d0" />
+    <title>PUMPJACK / USO</title>
+    <meta name="description" content="A memecoin paired with a tokenized oil fund. Trading fees are the oil; holders work the field for their cut." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Saira+Stencil+One&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+    <script type="module" crossorigin src="./assets/index-evL1jrPR.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-DPmS__rZ.css">
+  </head>
+  <body>
+    <!-- line icons, drawn like the plate -->
+    <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+      <defs>
+        <symbol id="i-rig" viewBox="0.5 1 20 20">
+          <path d="M3 17h14M7 17l2.5-9L12 17M3.5 7.5l13-2.5M3.5 5v6M16.5 5l-1 7M14 12.5h4V17h-4z" />
+        </symbol>
+        <symbol id="i-engine" viewBox="-1 -0.25 20 20">
+          <path d="M4 8h9v8H4zM13 10h3v4h-3M6.5 8V5.5h4V8M8.5 5.5V3.5M4 11H2M4 14H2M6.5 11h4M6.5 13.5h4" />
+        </symbol>
+        <symbol id="i-fuel" viewBox="0 -1.05 20 20">
+          <path d="M10 2.5c.6 3 4.2 4.6 4.2 8.7a4.2 4.2 0 0 1-8.4 0c0-1.9 1-3 1.9-4.1.3 1.4.9 2 1.6 2.3-.4-2.6.1-4.9.7-6.9z" />
+        </symbol>
+        <symbol id="i-well" viewBox="0 -0.5 20 20">
+          <path d="M3 17h14M6 17l3-13h2l3 13M7.2 12h5.6M8.2 8h3.6M7.2 12l4.6-4M12.8 12 8.2 8M10 4V2" />
+        </symbol>
+        <symbol id="i-desk" viewBox="0 0 20 20">
+          <path d="M3 17h14M5.5 13V8M5.5 15v-1M5.5 7V5M4 8h3v5H4zM10 11V6M10 14v-2M10 5V3M8.5 6h3v6h-3zM14.5 9V5M14.5 12v-2M14.5 4V3M13 5h3v5h-3z" />
+        </symbol>
+        <symbol id="i-emblem" viewBox="0 0 32 32">
+          <circle cx="16" cy="16" r="14.5" />
+          <path d="M6.5 24h19M12 24l3.5-13 3.5 13M6.5 11.5 25 8M6.5 8.5v8M25 8l-1.4 9.5M21.5 18h5.5v6h-5.5z" />
+        </symbol>
+      </defs>
+    </svg>
+
+    <canvas id="scene" aria-label="Cross-section of the oil field. Each pump moves only while trading fees arrive."></canvas>
+
+    <div id="topbar">
+      <header class="top">
+        <div class="brand">
+          <svg class="emblem"><use href="#i-emblem" /></svg>
+          <span class="word">PUMPJACK</span><span class="pair">/ USO</span>
+        </div>
+        <nav class="top-actions">
+          <button id="btnRules" class="btn ghost" type="button">Rules</button>
+          <button id="btnRisks" class="btn ghost" type="button">Risks</button>
+          <button id="btnWallet" class="btn" type="button" disabled>Wallet</button>
+        </nav>
+      </header>
+      <div id="strip" class="strip" role="status">
+        <span id="modeBadge" class="badge"></span>
+        <button id="wireChip" class="kv wire-chip" type="button" hidden><i>Oil wire</i><b id="wireChipText">—</b></button>
+        <span class="kv"><i>Shift</i><b id="fShift">—</b><b id="fClock" class="clock">—</b></span>
+        <span class="kv"><i>Gusher</i><b id="fGusher">—</b></span>
+        <span class="kv"><i>Fee flow</i><canvas id="spark" width="128" height="32" aria-hidden="true"></canvas><b id="fFlow">—</b></span>
+        <span class="kv"><i>This shift</i><b id="fPot">—</b></span>
+        <span class="kv"><i>Wells</i><b id="fCrews">—</b></span>
+        <span class="kv"><i>Burned</i><b id="fBurned">—</b></span>
+        <span class="kv"><i>Contract</i><b id="fCa">not launched</b></span>
+      </div>
+    </div>
+
+    <aside id="wire" class="wire compact" aria-label="Oil news, read by an AI agent" hidden>
+      <header class="wire-head">
+        <svg class="wire-key" viewBox="0 0 24 14" aria-hidden="true"><path d="M1 12.5h22M4 12.5V9h7v3.5M7.5 9V6.5M3 6.5h14l4-3M17 6.5v6M20 3.5v-2" /></svg>
+        <b class="wire-name">Oil wire</b>
+        <span class="wire-agent"><i class="wire-led" id="wireLed"></i><span id="wireAgent">AI agent</span></span>
+        <button id="wireFold" class="wire-fold" type="button">–</button>
+      </header>
+      <div class="wire-run" aria-hidden="true"><i></i></div>
+      <div class="wire-body">
+        <article class="wire-slip">
+          <div class="wire-meta"><span id="wireSrc"></span><time id="wireAge"></time></div>
+          <p class="wire-line"><span id="wireLine"></span><i class="wire-caret" aria-hidden="true"></i></p>
+          <div class="wire-verdict">
+            <span class="wire-stamp" id="wireStamp"></span>
+            <span class="wire-pips" id="wirePips" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+            <b class="wire-level" id="wireLevel"></b>
+            <a class="wire-link" id="wireLink" target="_blank" rel="noopener noreferrer">source ↗</a>
+          </div>
+          <p class="wire-why" id="wireWhy"></p>
+        </article>
+        <footer class="wire-foot">
+          <span class="wire-mood" id="wireMood"><i>Bear</i><span class="wire-scale"><b id="wireNeedle"></b></span><i>Bull</i></span>
+          <button id="wireAll" class="lnk" type="button">All</button>
+        </footer>
+      </div>
+    </aside>
+
+    <div id="bottom" class="panel">
+      <div id="charts" class="charts" hidden>
+        <div class="charts-row" id="chartsRow"></div>
+        <div class="charts-int" id="chartsInt" role="group" aria-label="Candle size">
+          <button type="button" data-i="1m">1m</button>
+          <button type="button" data-i="15m">15m</button>
+          <button type="button" data-i="1h">1h</button>
+          <button type="button" data-i="1d">1d</button>
+        </div>
+      </div>
+      <div id="toast" class="toast" role="status" aria-live="polite"></div>
+      <div id="ticker" class="ticker" aria-live="off"></div>
+      <div id="wellbar" class="wellbar" aria-label="Your well and the field">
+        <b id="wbName" class="wb-name">—</b>
+        <span class="wb"><i><span class="long">Your cut of a fee</span><span class="short">Your cut</span></i><b id="wbCut">—</b></span>
+        <span class="wb"><i><span class="long">Rank by weight</span><span class="short">Rank</span></i><b id="wbRank">—</b></span>
+        <span class="wb"><i>Gusher</i><b id="wbGusher">—</b></span>
+        <span class="wb"><i>On the field</i><b id="wbField">—</b></span>
+        <span class="wb more"><i>Field horsepower</i><b id="wbHp">—</b></span>
+        <span class="wb more"><i>Burned by everyone</i><b id="wbBurned">—</b></span>
+      </div>
+
+      <div id="gate" class="gate">
+        <h2>One wallet, one well</h2>
+        <p>Connect a wallet and its well is drilled on this lease. Every wallet has exactly one, and you see only your own. It pumps your share of every trade fee.</p>
+        <button id="btnConnect" class="btn primary" type="button">Connect wallet</button>
+        <p class="fine" id="gateNote">Demo: the wallet is a button. No real wallet is asked for anything, and the tokens in it are made up.</p>
+      </div>
+
+      <div class="tabs" role="tablist" aria-label="Your rig">
+        <button class="tab-btn" type="button" role="tab" data-tab="rig"><svg class="ic"><use href="#i-rig" /></svg><span>Rig</span></button>
+        <button class="tab-btn" type="button" role="tab" data-tab="engine"><svg class="ic"><use href="#i-engine" /></svg><span>Engine</span></button>
+        <button class="tab-btn" type="button" role="tab" data-tab="fuel"><svg class="ic"><use href="#i-fuel" /></svg><span class="long">Overdrive</span><span class="short">Drive</span></button>
+        <button class="tab-btn" type="button" role="tab" data-tab="well"><svg class="ic"><use href="#i-well" /></svg><span class="long">Well works</span><span class="short">Works</span></button>
+        <button class="tab-btn" type="button" role="tab" data-tab="desk"><svg class="ic"><use href="#i-desk" /></svg><span>Desk</span></button>
+      </div>
+
+      <div class="tab-body">
+        <!-- RIG -->
+        <section class="tab" data-tab="rig">
+          <div class="tab-head">
+            <b id="rigTitle">YOUR RIG</b>
+            <span id="rigState" class="state"></span>
+          </div>
+          <div class="stats">
+            <div>
+              <label>Horsepower</label><b id="stHp">—</b>
+              <small id="stHpParts"></small>
+            </div>
+            <div>
+              <label>Condition</label><b id="stCond">—</b>
+              <span class="bar"><span id="stCondBar"></span></span>
+            </div>
+            <div>
+              <label>Your cut</label><b id="stCut">—</b>
+              <small id="stCutParts"></small>
+            </div>
+          </div>
+          <div class="barrels">
+            <div>
+              <label>Earned this shift</label>
+              <b id="stAccrued">—</b><small id="stAccruedUsd"></small>
+            </div>
+            <div>
+              <label>Ready to claim</label>
+              <b id="stClaim">—</b><small id="stClaimUsd"></small>
+            </div>
+          </div>
+          <div class="kit" role="group" aria-label="What this rig runs on">
+            <button class="kit-btn" type="button" data-go="engine"><i>Engine</i><b id="kitEngine">—</b></button>
+            <button class="kit-btn" type="button" data-go="fuel"><i>Overdrive</i><b id="kitFuel">—</b></button>
+            <button class="kit-btn" type="button" data-go="well"><i id="kitWorksLevel">Works</i><b id="kitWorks">—</b></button>
+          </div>
+          <div class="actions">
+            <button id="btnService" class="btn" type="button">Service rig</button>
+            <button id="btnClaim" class="btn primary" type="button">Claim</button>
+          </div>
+        </section>
+
+        <!-- ENGINE -->
+        <section class="tab" data-tab="engine" hidden>
+          <div class="tab-head">
+            <b>Engine · <span id="enTier">Stock</span></b>
+            <span id="enLoad" class="state"></span>
+          </div>
+          <div class="ladder" id="enLadder"></div>
+          <table class="deal" id="enDeal"></table>
+          <p class="cost" id="enCost"></p>
+          <div class="actions">
+            <button id="offEngineNext" class="btn primary" type="button"></button>
+            <button id="offEngineMax" class="btn" type="button"></button>
+          </div>
+        </section>
+
+        <!-- OVERDRIVE -->
+        <section class="tab" data-tab="fuel" hidden>
+          <div class="tab-head">
+            <b>Overdrive</b>
+            <span id="fuLeft" class="state"></span>
+          </div>
+          <button id="btnOd" class="switch" type="button" role="switch" aria-checked="false">
+            <span class="lever"><span></span></span>
+            <span id="odLabel"></span>
+          </button>
+          <table class="deal" id="fuDeal"></table>
+          <p class="cost" id="fuVerdict"></p>
+          <div class="actions">
+            <button id="offFuel1" class="btn" type="button"></button>
+            <button id="offFuel4" class="btn" type="button"></button>
+            <button id="offFuel12" class="btn" type="button"></button>
+          </div>
+        </section>
+
+        <!-- WELL WORKS -->
+        <section class="tab" data-tab="well" hidden>
+          <div class="tab-head">
+            <b id="wkTitle">Well works</b>
+            <span id="wkNext" class="state"></span>
+          </div>
+          <div class="ladder" id="wkLadder"></div>
+          <p class="line" id="wkFund"></p>
+          <table class="deal" id="wkDeal"></table>
+          <p class="cost" id="wkCost"></p>
+          <div class="actions">
+            <button id="offWorksNext" class="btn primary" type="button"></button>
+            <button id="offWorksMax" class="btn" type="button"></button>
+          </div>
+        </section>
+
+        <!-- OIL DESK -->
+        <section class="tab desk" data-tab="desk" hidden>
+          <div class="tab-head">
+            <b class="desk-title">Oil desk</b>
+            <div class="acct-tabs in-head" id="dkTabsHead" aria-label="Ticket and account"></div>
+            <span class="head-actions">
+              <button id="dkPositions" class="btn mini" type="button" title="Which account is on the desk, and its wallet"><span id="dkEquity">Account</span></button>
+              <button id="dkDeposit" class="btn mini" type="button">Fund</button>
+            </span>
+          </div>
+          <div class="desk-grid">
+            <div class="desk-pick">
+              <div class="mkts" id="dkMarkets"></div>
+              <div class="dial">
+                <label for="dkLev">Leverage</label>
+                <button class="nudge" type="button" data-for="dkLev" data-by="-1" aria-label="Less leverage">−</button>
+                <input id="dkLev" type="range" min="1" max="20" step="1" value="5" />
+                <button class="nudge" type="button" data-for="dkLev" data-by="1" aria-label="More leverage">+</button>
+                <output id="dkLevOut" for="dkLev">5x</output>
+              </div>
+              <div class="dial">
+                <label for="dkMargin">Margin</label>
+                <button class="nudge" type="button" data-for="dkMargin" data-by="-5" aria-label="Less margin">−</button>
+                <input id="dkMargin" type="range" min="0" max="100" step="1" value="50" />
+                <button class="nudge" type="button" data-for="dkMargin" data-by="5" aria-label="More margin">+</button>
+                <input id="dkMarginUsd" class="amount" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="Margin in dollars" />
+              </div>
+            </div>
+            <div class="desk-order">
+              <div class="deal-wrap"><table class="deal kvt" id="dkDeal"></table></div>
+              <div class="actions">
+                <button id="dkClose" class="btn" type="button" hidden>Close</button>
+                <button id="dkOpen" class="btn primary" type="button">Long</button>
+                <button id="dkShort" class="btn short" type="button">Short</button>
+              </div>
+            </div>
+            <div class="desk-acct">
+              <div class="acct-tabs in-acct" id="dkTabsAcct" aria-label="Account"></div>
+              <div class="acct-body" id="dkAcct"></div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <aside id="feed" class="feed panel" aria-label="Latest fees">
+        <h2>Fees landing <span>USO</span></h2>
+        <ol id="feedList"></ol>
+      </aside>
+    </div>
+
+    <canvas id="fx" class="fx" aria-hidden="true"></canvas>
+
+    <div id="offline" class="offline" hidden>
+      <h1>The field is not drilled yet</h1>
+      <p>$PUMPJACK has not launched. There are no trades, so there is nothing real to show and the pumps stand still.</p>
+      <a class="btn primary" href="?demo">Play the demo simulation</a>
+    </div>
+
+    <div id="service" class="service" hidden>
+      <div class="service-card" role="dialog" aria-modal="true" aria-labelledby="svcTitle">
+        <h2 id="svcTitle">Torque the bolts</h2>
+        <p>Hit when the needle is inside the red band. Three hits and the rig is back to 100%.</p>
+        <svg id="gauge" viewBox="0 0 240 150" aria-hidden="true">
+          <path id="gDial" fill="none" stroke="#1b1611" stroke-width="2" />
+          <path id="gBand" fill="none" stroke="#d9381a" stroke-width="12" />
+          <g id="gTicks" stroke="#1b1611" stroke-width="1.5"></g>
+          <line id="gNeedle" x1="120" y1="126" x2="120" y2="32" stroke="#1b1611" stroke-width="3" stroke-linecap="round" />
+          <circle cx="120" cy="126" r="6" fill="#1b1611" />
+        </svg>
+        <div id="svcPips" class="pips"><i></i><i></i><i></i></div>
+        <div class="actions">
+          <button id="svcHit" class="btn primary" type="button">Hit</button>
+          <button id="svcCancel" class="btn ghost" type="button">Cancel</button>
+        </div>
+        <button id="svcSkip" class="link" type="button" hidden>Service without the gauge</button>
+      </div>
+    </div>
+
+    <dialog id="dlgDeposit" class="sheet">
+      <h2>Fund the desk</h2>
+      <p class="fine" id="depMode"></p>
+      <div id="depTest" hidden>
+        <table class="deal kvt" id="depTestInfo"></table>
+        <div class="actions wrap" id="depTestActions"></div>
+      </div>
+      <h3 id="depRouteTitle">From Solana</h3>
+      <div class="actions wrap" id="depWallets"></div>
+      <div class="seg wide" id="depAsset" role="group" aria-label="What to send">
+        <button type="button" data-a="USO">USO</button>
+        <button type="button" data-a="SOL">SOL</button>
+        <button type="button" data-a="USDC">USDC</button>
+        <button type="button" data-a="PUMPJACK">$PUMPJACK</button>
+      </div>
+      <div class="seg wide" id="depFrac" role="group" aria-label="How much">
+        <button type="button" data-f="0.25">25%</button>
+        <button type="button" data-f="0.5">50%</button>
+        <button type="button" data-f="1">All</button>
+      </div>
+      <table class="deal kvt" id="depDeal"></table>
+      <p class="note" id="depNote"></p>
+      <div class="actions">
+        <button id="depGo" class="btn primary" type="button">Deposit</button>
+        <button id="depClose" class="btn" type="button">Close</button>
+      </div>
+    </dialog>
+
+    <dialog id="dlgPositions" class="sheet">
+      <h2>Desk account</h2>
+      <div class="seg wide" id="dkMode" role="group" aria-label="Which account">
+        <button type="button" data-mode="paper">Paper</button>
+        <button type="button" data-mode="real">Testnet</button>
+      </div>
+      <p class="fine" id="posMode"></p>
+      <div id="walletBox" hidden>
+        <table class="deal kvt" id="walletInfo"></table>
+        <div class="actions wrap" id="walletActions"></div>
+      </div>
+      <table class="deal kvt" id="posAcct"></table>
+      <p class="fine">Positions, waiting orders, fills and balances are on the desk itself, beside the ticket.</p>
+      <form method="dialog"><button class="btn primary">Close</button></form>
+    </dialog>
+
+    <dialog id="dlgClose" class="sheet">
+      <h2>Market close</h2>
+      <p class="fine" id="clNote"></p>
+      <table class="deal kvt" id="clInfo"></table>
+      <div class="dial">
+        <label for="clPct">Size</label>
+        <button class="nudge" type="button" id="clLess" aria-label="Close less">−</button>
+        <input id="clPct" type="range" min="1" max="100" step="1" value="100" />
+        <button class="nudge" type="button" id="clMore" aria-label="Close more">+</button>
+        <output id="clPctOut" for="clPct">100%</output>
+      </div>
+      <div class="seg wide" id="clQuick" role="group" aria-label="How much of the position">
+        <button type="button" data-p="25">25%</button>
+        <button type="button" data-p="50">50%</button>
+        <button type="button" data-p="75">75%</button>
+        <button type="button" data-p="100">100%</button>
+      </div>
+      <table class="deal kvt" id="clDeal"></table>
+      <div class="actions">
+        <button id="clGo" class="btn primary" type="button">Close position</button>
+        <button id="clCancel" class="btn" type="button">Cancel</button>
+      </div>
+    </dialog>
+
+    <dialog id="dlgTpsl" class="sheet">
+      <h2>Position TP/SL</h2>
+      <table class="deal kvt" id="tpInfo"></table>
+      <div class="tpsl">
+        <label for="tpPx">Take profit at</label>
+        <input id="tpPx" class="field" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="price" />
+        <label for="tpPct">Gain %</label>
+        <input id="tpPct" class="field" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="% of margin" />
+        <label for="slPx">Stop loss at</label>
+        <input id="slPx" class="field" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="price" />
+        <label for="slPct">Loss %</label>
+        <input id="slPct" class="field" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="% of margin" />
+      </div>
+      <table class="deal kvt" id="tpDeal"></table>
+      <p class="note" id="tpNote"></p>
+      <div class="actions">
+        <button id="tpGo" class="btn primary" type="button">Confirm</button>
+        <button id="tpCancel" class="btn" type="button">Cancel</button>
+      </div>
+    </dialog>
+
+    <dialog id="dlgWire" class="sheet">
+      <h2>Oil wire</h2>
+      <p class="fine" id="wireAbout"></p>
+      <ol id="wireList" class="wire-list"></ol>
+      <p class="note" id="wireFeeds"></p>
+      <form method="dialog"><button class="btn primary">Close</button></form>
+    </dialog>
+
+    <dialog id="dlgRules" class="sheet">
+      <h2>How the field pays</h2>
+      <ol id="rulesList"></ol>
+      <p id="rulesDemo" class="fine" hidden>Demo clock runs 30 times faster than the live field. Every trade, every other well and the token price on screen are simulated, no token is really burned, and the wallet is a button: no real wallet is asked for anything.</p>
+      <form method="dialog"><button class="btn primary">Close</button></form>
+    </dialog>
+
+    <dialog id="dlgRisks" class="sheet">
+      <h2>Risks, stated plainly</h2>
+      <ul>
+        <li>$PUMPJACK is a memecoin. It is not backed by oil, by USO or by anything else.</li>
+        <li>USO here is a token issued by Backpack Securities that tracks the United States Oil Fund, a fund holding oil futures. It is not crude oil and not shares of oil companies.</li>
+        <li>The issuer can freeze, pause or take back USO tokens in any wallet. If that happens, payouts stop.</li>
+        <li>What you earn depends on trading volume. No volume, no oil. Nothing here is a promised return.</li>
+        <li>Tokens burned on an engine, on fuel or in your well's works cannot be recovered. If trading dries up, what you paid for earns nothing.</li>
+        <li>The "per shift" and "pays back in" figures are arithmetic on the recent fee flow and the current token price. They are not forecasts. Both move.</li>
+        <li>The oil wire is an AI model reading headlines. Its "bullish" and "bearish" marks are a reading of the news, not of the market. They are often wrong, and they are not advice to buy or sell anything.</li>
+        <li>Upgrades only move the split between players. When everyone upgrades, shares end up where they started and the tokens are still burned.</li>
+        <li>Tokens burned into your well's works silt away a little at every shift close, and the level they bought goes with them unless you top them up.</li>
+        <li>A well belongs to the wallet that drilled it. It cannot be moved to another wallet, and the tokens that give it horsepower have to stay in that wallet.</li>
+        <li>The oil desk trades leveraged contracts on a third-party exchange. A position can be liquidated and its whole margin lost within minutes. Trading there earns nothing on the field.</li>
+        <li>The desk has two accounts. Paper is simulated on live prices: nothing is signed or sent, and no funding payments are counted. Testnet is a real exchange account run on test money: your wallet signs, and the orders are real orders on Hyperliquid's test network.</li>
+        <li>On the desk this browser keeps a trading key. Once you approve it, it can place and close orders on your exchange account until you remove it. The exchange does not let it withdraw. Anyone who can use this browser profile can use that key.</li>
+        <li>Earned USO sits in the field treasury wallet until you claim it.</li>
+        <li>Holding USO may be restricted where you live. Checking that is on you.</li>
+      </ul>
+      <form method="dialog"><button class="btn primary">Close</button></form>
+    </dialog>
+
+  </body>
+</html>
